@@ -1,0 +1,6 @@
+window.CHALET_DATA = window.CHALET_DATA || {};
+window.CHALET_DATA.promotions = [
+  { title: 'Maxi cotoletta all’Emiliana 2×1', location: 'tutte', validFrom: null, validTo: null, image: 'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=1000&q=85', description: 'La pagina promozioni ufficiale indica disponibilità dalla domenica al giovedì. Verifica sede, condizioni e validità aggiornate.', active: true, url: 'https://www.chaletcarpi.it/it/promozioni.php' },
+  { title: 'Gnocco fritto · 8 €', location: 'parco', validFrom: null, validTo: null, image: 'https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=1000&q=85', description: 'Proposta segnalata sul sito ufficiale per Chalet 3.0 Al Parco. Verifica disponibilità attuale.', active: true, url: 'https://www.chaletcarpi.it/it/promozioni.php' },
+  { title: 'Gnocco fritto da asporto · 20 pezzi / 8 €', location: 'tutte', validFrom: null, validTo: null, image: 'https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=1000&q=85', description: 'Proposta asporto riportata sul sito ufficiale. Verifica sede, condizioni e disponibilità.', active: true, url: 'https://www.chaletcarpi.it/it/promozioni.php' }
+];
