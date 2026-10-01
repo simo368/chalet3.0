@@ -2,7 +2,11 @@
   const data = window.CHALET_DATA || {};
   const locations = data.locations || [];
   const main = document.querySelector('main');
-  const path = decodeURI(location.pathname).replace(/\/$/, '') || '/';
+  const basePath = window.CHALET_BASE || '';
+  const fileMode = window.CHALET_FILE_MODE === true;
+  let appPath = fileMode ? (location.hash.startsWith('#/') ? location.hash.slice(1) : '/') : decodeURI(location.pathname);
+  if (basePath && (appPath === basePath || appPath.startsWith(`${basePath}/`))) appPath = appPath.slice(basePath.length) || '/';
+  const path = appPath.replace(/\/$/, '') || '/';
   const official = 'https://www.chaletcarpi.it';
   const esc = (s = '') => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const locationById = id => locations.find(l => l.id === id);
@@ -18,6 +22,17 @@
   const modal = `<dialog class="media-dialog" aria-label="Visualizzatore media"><button class="dialog-close" aria-label="Chiudi">×</button><div class="dialog-body"></div><p class="dialog-caption"></p></dialog>`;
   const cardGrid = (cards, renderer) => `<div class="route-grid">${cards.map(renderer).join('')}</div>`;
   const locName = id => locationById(id)?.name || 'Chalet 3.0';
+  const applyBasePath = (root = document) => {
+    if (!basePath && !fileMode) return;
+    root.querySelectorAll('a[href^="/"]').forEach(a => {
+      const href = a.getAttribute('href');
+      if (fileMode) {
+        a.setAttribute('href', href.startsWith('/#') ? `index.html${href.slice(1)}` : `index.html#${href}`);
+        return;
+      }
+      if (href && !href.startsWith(`${basePath}/`) && href !== basePath) a.setAttribute('href', `${basePath}${href}`);
+    });
+  };
   const eventCard = ev => `<article class="content-card filterable" data-location="${ev.location}"><a href="/eventi/${ev.slug}"><img src="${ev.image}" alt="Immagine dimostrativa: ${esc(ev.title)}" loading="lazy"><div class="content-card-copy"><span>${ev.date ? new Date(`${ev.date}T12:00:00`).toLocaleDateString('it-IT',{day:'2-digit',month:'long',year:'numeric'}) : 'CALENDARIO DA VERIFICARE'} · ${esc(locName(ev.location))}</span><h2>${esc(ev.title)}</h2><p>${esc(ev.description)}</p><b>Dettagli ↗</b></div></a></article>`;
   const promoData = (data.promotions || []).filter(p => p.active && (!p.validTo || new Date(p.validTo) >= new Date()));
   const promoCard = p => `<article class="content-card filterable" data-location="${p.location}"><a href="${p.url}" target="_blank" rel="noopener"><img src="${p.image}" alt="Immagine dimostrativa per ${esc(p.title)}" loading="lazy"><div class="content-card-copy"><span>${esc(locName(p.location))} · ${p.validTo ? `FINO AL ${esc(p.validTo)}` : 'VALIDITÀ DA CONFERMARE'}</span><h2>${esc(p.title)}</h2><p>${esc(p.description)}</p><b>Verifica l’offerta ↗</b></div></a></article>`;
@@ -41,6 +56,7 @@
     if (footer) footer.innerHTML = `<div class="footer-top"><a class="wordmark footer-mark" href="/">CHALET<span>3.0</span></a><p>Due anime.<br>Un unico Chalet.</p><a class="footer-reserve" href="/prenota">Prenota un tavolo ↗</a></div><div class="route-footer-links"><div><b>LOCATION</b><a href="/in-piazzetta">In Piazzetta</a><a href="/al-parco">Al Parco</a></div><div><b>MANGIA & BEVI</b><a href="/menu">Menu</a><a href="/#pranzo">Pranzo</a><a href="/#aperitivo">Aperitivo</a><a href="/asporto">Asporto</a></div><div><b>EVENTI</b><a href="/in-programma">In programma</a><a href="/eventi-privati">Privati</a><a href="/eventi-aziendali">Aziendali</a><a href="/catering">Catering</a></div><div><b>SCOPRI</b><a href="/promozioni">Promozioni</a><a href="/gallery">Gallery</a><a href="/dicono-di-noi">Recensioni</a><a href="/dove-siamo">Dove siamo</a></div><div><b>CONTATTI</b><a href="/prenota">Prenotazioni</a><a href="/contatti">WhatsApp · Telefono</a><a href="/lavora-con-noi">Lavora con noi</a></div></div><div class="footer-bottom"><span>© CHALET 3.0 · P.IVA 03697250367</span><span>CARPI, MODENA</span><a href="${official}" target="_blank" rel="noopener">Privacy & Cookie ↗</a></div>`;
     document.querySelector('.mobile-bar').innerHTML = '<a href="/prenota">PRENOTA</a><a href="https://wa.me/39059640225" target="_blank" rel="noopener">WHATSAPP</a><a href="/menu">MENU</a>';
     const moreButton = document.querySelector('.nav-more button'); moreButton.addEventListener('click', () => { const open = moreButton.getAttribute('aria-expanded') !== 'true'; moreButton.setAttribute('aria-expanded', String(open)); moreButton.nextElementSibling.classList.toggle('open', open); });
+    applyBasePath();
   };
 
   // On the home route keep all existing sections and only connect new destinations.
@@ -54,6 +70,7 @@
     if (booking) booking.insertAdjacentHTML('afterend', `<div class="home-discovery section-pad"><a href="/gallery">Guarda la gallery ↗</a><a href="/promozioni">Promozioni ↗</a><a href="/dicono-di-noi">Recensioni ↗</a><a href="/catering">Eventi & catering ↗</a></div>`);
     document.querySelector('.mobile-bar').innerHTML='<a href="/menu">MENU</a><a href="https://wa.me/39059640225" target="_blank" rel="noopener">WHATSAPP</a><a href="/prenota">PRENOTA ↗</a>';
     document.querySelectorAll('.footer-columns').forEach(col=>col.insertAdjacentHTML('beforeend','<div><h4>ALTRO</h4><a href="/gallery">Gallery</a><a href="/promozioni">Promozioni</a><a href="/in-programma">In programma</a><a href="/dicono-di-noi">Recensioni</a><a href="/eventi-privati">Eventi privati</a><a href="/eventi-aziendali">Eventi aziendali</a><a href="/catering">Catering</a><a href="/dove-siamo">Dove siamo</a><a href="/lavora-con-noi">Lavora con noi</a></div>'));
+    applyBasePath();
     return;
   }
 
@@ -110,8 +127,6 @@
   } else {
     dataRoute('Pagina non trovata','La pagina richiesta non è disponibile.',`${titleBlock('CHALET 3.0','Pagina non trovata','Il link potrebbe essere cambiato. Torna alla homepage e scegli una sezione.')}${cta('/','Vai alla homepage')}`);
   }
-  document.querySelectorAll('a[href^="/"]').forEach(a=>a.addEventListener('click',()=>{if(a.getAttribute('href').startsWith('/#'))return;}));
-
   function eventForm(type) {
     return `<form class="demo-form" data-demo-form><input type="hidden" name="tipo" value="${esc(type)}"><div class="form-grid"><label>Nome<input name="nome" required autocomplete="given-name"></label><label>Cognome<input name="cognome" required autocomplete="family-name"></label><label>Email<input name="email" type="email" required autocomplete="email"></label><label>Telefono<input name="telefono" type="tel" required autocomplete="tel"></label><label>Tipo di evento<select name="tipoEvento" required><option value="">Seleziona</option><option>Compleanno / festa</option><option>Evento aziendale</option><option>Catering</option><option>Altro</option></select></label><label>Numero invitati<input name="invitati" type="number" min="1"></label><label>Data<input name="data" type="date"></label><label>Location preferita<select name="location"><option>Da definire</option><option>In Piazzetta</option><option>Al Parco</option><option>Fuori sede</option></select></label><label>Budget indicativo<input name="budget" placeholder="Facoltativo"></label><label class="wide">Messaggio<textarea name="messaggio" rows="4"></textarea></label><label class="privacy wide"><input type="checkbox" required> Acconsento al trattamento dei dati per essere ricontattato. Informativa privacy da collegare.</label></div><button class="button button-gold" type="submit">Invia richiesta <span>↗</span></button><p class="form-feedback" aria-live="polite">Modulo dimostrativo: non invia dati. Il backend e l’informativa privacy vanno configurati prima della pubblicazione.</p></form>`;
   }
