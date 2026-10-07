@@ -61,16 +61,7 @@
 
   // On the home route keep all existing sections and only connect new destinations.
   if (path === '/') {
-    const nav = document.querySelector('.main-nav');
-    if (nav) nav.innerHTML = '<a href="#locali">I locali</a><a href="#cucina">Menu</a><a href="/asporto">Asporto</a><a href="/eventi">Eventi</a><a href="/promozioni">Promozioni</a><a href="/gallery">Gallery</a><a href="/contatti">Contatti</a>';
-    const reserveLink=document.querySelector('.nav-book');if(reserveLink)reserveLink.href='/prenota';
-    document.querySelectorAll('.location-copy .text-link').forEach((a,i)=>a.href=i===0?'/in-piazzetta':'/al-parco');
-    const homeEvent = document.querySelector('.events-title .text-link'); if(homeEvent) homeEvent.href='/in-programma';
-    const booking = document.querySelector('#prenota');
-    if (booking) booking.insertAdjacentHTML('afterend', `<div class="home-discovery section-pad"><a href="/gallery">Guarda la gallery ↗</a><a href="/promozioni">Promozioni ↗</a><a href="/dicono-di-noi">Recensioni ↗</a><a href="/catering">Eventi & catering ↗</a></div>`);
-    document.querySelector('.mobile-bar').innerHTML='<a href="/menu">MENU</a><a href="https://wa.me/39059640225" target="_blank" rel="noopener">WHATSAPP</a><a href="/prenota">PRENOTA ↗</a>';
-    document.querySelectorAll('.footer-columns').forEach(col=>col.insertAdjacentHTML('beforeend','<div><h4>ALTRO</h4><a href="/gallery">Gallery</a><a href="/promozioni">Promozioni</a><a href="/in-programma">In programma</a><a href="/dicono-di-noi">Recensioni</a><a href="/eventi-privati">Eventi privati</a><a href="/eventi-aziendali">Eventi aziendali</a><a href="/catering">Catering</a><a href="/dove-siamo">Dove siamo</a><a href="/lavora-con-noi">Lavora con noi</a></div>'));
-    applyBasePath();
+    // Preserve in-page navigation so buttons, hamburger menu and booking links scroll smoothly
     return;
   }
 

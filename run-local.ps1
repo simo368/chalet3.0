@@ -1,4 +1,4 @@
-$ErrorActionPreference = 'Stop'
+﻿$ErrorActionPreference = 'Stop'
 $root = (Resolve-Path -LiteralPath $PSScriptRoot).Path
 $rootPrefix = $root.TrimEnd([System.IO.Path]::DirectorySeparatorChar) + [System.IO.Path]::DirectorySeparatorChar
 $listener = [System.Net.HttpListener]::new()
@@ -35,7 +35,7 @@ try {
         }
       }
       $context.Response.ContentLength64 = $bytes.Length
-      $context.Response.OutputStream.Write($bytes, 0, $bytes.Length)
+      if ($context.Request.HttpMethod -ne "HEAD") { $context.Response.OutputStream.Write($bytes, 0, $bytes.Length) }
     } finally { $context.Response.Close() }
   }
 } finally { $listener.Stop(); $listener.Close() }
